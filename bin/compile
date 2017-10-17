@@ -32,7 +32,7 @@ mkdir -p ${CACHE_DIR}
 mkdir -p ${BUILD_DIR}/.profile.d
 DEPLOYMENT_FILE_LOCATION=${SRC_DIR}/.deployment
 
-if [ ! -e "$( find . -maxdepth 1 -iname $DEPLOYMENT_FILE_LOCATION )"  ]; then
+if [ ! -f $DEPLOYMENT_FILE_LOCATION  ]; then
 	echo "No deployment file found"
 	exit 1
 fi
