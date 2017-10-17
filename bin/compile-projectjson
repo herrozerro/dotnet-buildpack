@@ -66,12 +66,7 @@ echo "Restoring packages in projects"
 dotnet restore ${SRC_DIR}/src
 
 # figure out which projects we should deploy/publish
-if [ -e ${DEPLOYMENT_FILE_LOCATION} ]; then
-	PROJECT_JSON_FILES=$(awk -F "=" '/project/ {print $2}' ${DEPLOYMENT_FILE_LOCATION} | tr -d ' ')
-else
-	echo "No deployment file found"
-	exit 1
-fi
+PROJECT_JSON_FILES=$(awk -F "=" '/project/ {print $2}' ${DEPLOYMENT_FILE_LOCATION} | tr -d ' ')
 
 # run on  each project we need to publish, build it and deploy it
  while IFS=';' read -ra ADDR; do

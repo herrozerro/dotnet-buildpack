@@ -32,6 +32,11 @@ mkdir -p ${CACHE_DIR}
 mkdir -p ${BUILD_DIR}/.profile.d
 DEPLOYMENT_FILE_LOCATION=${SRC_DIR}/.deployment
 
+if [ ! -e "$( find . -maxdepth 1 -iname $DEPLOYMENT_FILE_LOCATION )"  ]; then
+	echo "No deployment file found"
+	exit 1
+fi
+
 echo "Installing the dependencies"
 apt_install libunwind8 gettext
 
@@ -39,9 +44,24 @@ apt_install libunwind8 gettext
 if [ -n "$( find $SRC_DIR -maxdepth 3 -iname project.json )" ]; then
   echo "'Project.json' project type detected"
   source $BUILDPACK_DIR/bin/compile-projectjson
+elif [ -n "$( find $SRC_DIR -maxdepth 3 -iname *.csproj )" ]; then
+  # detect sdk version
+  echo "'csproj' project type detected"
+  VERSION=$(grep -oPm1 "(?<=<TargetFramework>netcoreapp)[^<]+" <$(find ./src/Xavier.API/*.csproj))
+  TARGET_VERSION=$(grep -oPm1 "(?<=<TargetFramework>netcoreapp)[^<]+" <$(find ./src/Xavier.API/*.csproj))
+  if [[ $TARGET_VERSION == 2.* ]]; then
+    echo "Target version is .net core 2"
+    source $BUILDPACK_DIR/bin/compile-csproj-2
+  elif [[ $TARGET_VERSION == 1.* ]]; then
+    echo "Target version is .net core 1"
+    source $BUILDPACK_DIR/bin/compile-csproj-1
+  else
+    echo "Target version wasn't detected"
+    exit 1
+  fi
 else
-  echo "'Csproj' project type detected"
-  source $BUILDPACK_DIR/bin/compile-csproj
+  echo "Project type not detected"
+  exit 1
 fi
 
  # copy procfile
