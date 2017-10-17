@@ -9,7 +9,7 @@ tar zxf dotnet.tar.gz -C ${DOTNET_CACHE_LOCATION}
 
 export PATH="${DOTNET_CACHE_LOCATION}:${PATH}"
 cat <<EOF >$BUILD_DIR/.profile.d/000_dotnet.sh
-export PATH="\$HOME/dotnet/$\DOTNET_SDK_VERSION:\$PATH"
+export PATH="\$HOME/dotnet/\$DOTNET_SDK_VERSION:\$PATH"
 EOF
 
 cd $BUILD_DIR
