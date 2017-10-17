@@ -1,32 +1,13 @@
 #!/usr/bin/env bash
 
-: ${DOTNET_RUNTIME_VERSION:="2.0.0"}
-: ${DOTNET_SDK_VERSION:="2.0.0"}
+curl -sSL -o dotnet.tar.gz https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-linux-x64.tar.gz
+mkdir -p ${BUILD_DIR}/.heroku/dotnet && tar zxf dotnet.tar.gz -C ${BUILD_DIR}/.heroku/dotnet
+ln -s ${BUILD_DIR}/.heroku/dotnet /app
 
+export PATH="/app/dotnet:${PATH}"
 
-# Install .NET Core
-DOTNET_CACHE_LOCATION=${CACHE_DIR}/dotnet/${DOTNET_SDK_VERSION}
-if [ ! -d ${DOTNET_CACHE_LOCATION} ]; then
-	rm -rf ${CACHE_DIR}/dotnet/* || true
-	mkdir -p ${DOTNET_CACHE_LOCATION}/{sdk,runtime}
-	DOTNET_SDK_DOWNLOAD_URL=https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-$DOTNET_SDK_VERSION-linux-x64.tar.gz
-	
-	echo "Downloading .NET SDK version ${DOTNET_SDK_VERSION} and runtime version ${DOTNET_RUNTIME_VERSION} from ${DOTNET_SDK_DOWNLOAD_URL}"
-
-	curl --progress-bar ${DOTNET_SDK_DOWNLOAD_URL} | tar xz -C ${DOTNET_CACHE_LOCATION}/sdk
-	find ${DOTNET_CACHE_LOCATION}/sdk/sdk/${DOTNET_SDK_VERSION}/runtimes/* -maxdepth 0 ! -name unix ! -name any -exec rm -r {} +
-	rm -f ${DOTNET_CACHE_LOCATION}/sdk/sdk/${DOTNET_SDK_VERSION}/nuGetPackagesArchive.lzma
-
-	DOTNET_RUNTIME_DOWNLOAD_URL=https://download.microsoft.com/download/5/F/0/5F0362BD-7D0A-4A9D-9BF9-022C6B15B04D/dotnet-runtime-$DOTNET_RUNTIME_VERSION-linux-x64.tar.gz
-	curl --progress-bar ${DOTNET_RUNTIME_DOWNLOAD_URL} | tar xz -C ${DOTNET_CACHE_LOCATION}/runtime
-fi
-export PATH="${DOTNET_CACHE_LOCATION}/sdk:$PATH"
-cp -r ${DOTNET_CACHE_LOCATION}/runtime ${BUILD_DIR}/dotnet
-cat <<EOF >$BUILD_DIR/.profile.d/000_dotnet.sh
-export PATH="\$HOME/dotnet:\$PATH"
-EOF
-
-export NUGET_PACKAGES="${CACHE_DIR}/nuget/cache"
+cd $BUILD_DIR
+dotnet --info
 
 # run on  each project we need to publish, build it and deploy it
  while IFS=';' read -ra ADDR; do
