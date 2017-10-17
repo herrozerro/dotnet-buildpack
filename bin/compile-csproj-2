@@ -5,6 +5,7 @@ mkdir -p ${BUILD_DIR}/.heroku/dotnet && tar zxf dotnet.tar.gz -C ${BUILD_DIR}/.h
 ln -s ${BUILD_DIR}/.heroku/dotnet /app
 
 export PATH="/app/dotnet:${PATH}"
+export PATH="${BUILD_DIR}/.heroku/dotnet:${PATH}"
 
 cd $BUILD_DIR
 dotnet --info
