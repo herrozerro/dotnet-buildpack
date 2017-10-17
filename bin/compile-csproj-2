@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
-: ${DOTNET_SDK_VERSION:="2.0.0"}
 
-DOTNET_CACHE_LOCATION=${CACHE_DIR}/dotnet/${DOTNET_SDK_VERSION}
+DOTNET_CACHE_LOCATION=${CACHE_DIR}/dotnet
 mkdir -p ${DOTNET_CACHE_LOCATION}
 
-curl -sSL -o dotnet.tar.gz https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-$DOTNET_SDK_VERSION-linux-x64.tar.gz
+curl -sSL -o dotnet.tar.gz https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-linux-x64.tar.gz
 tar zxf dotnet.tar.gz -C ${DOTNET_CACHE_LOCATION}
 
 export PATH="${DOTNET_CACHE_LOCATION}:${PATH}"
 cat <<EOF >$BUILD_DIR/.profile.d/000_dotnet.sh
-export PATH="\$HOME/dotnet/\$DOTNET_SDK_VERSION:\$PATH"
+export PATH="\$HOME/dotnet:\$PATH"
 EOF
 
 cd $BUILD_DIR
