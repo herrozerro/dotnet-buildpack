@@ -37,6 +37,10 @@ if [ ! -f $DEPLOYMENT_FILE_LOCATION  ]; then
 	exit 1
 fi
 
+# figure out which projects we should deploy/publish
+PROJECTS=$(awk -F "=" '/project/ {print $2}' ${DEPLOYMENT_FILE_LOCATION} | tr -d ' ')
+echo "Detected projects for deployment: $PROJECTS"
+
 echo "Installing the dependencies"
 apt_install libunwind8 gettext
 
@@ -47,8 +51,8 @@ if [ -n "$( find $SRC_DIR -maxdepth 3 -iname project.json )" ]; then
 elif [ -n "$( find $SRC_DIR -maxdepth 3 -iname *.csproj )" ]; then
   # detect sdk version
   echo "'csproj' project type detected"
-  VERSION=$(grep -oPm1 "(?<=<TargetFramework>netcoreapp)[^<]+" <$(find ./src/Xavier.API/*.csproj))
-  TARGET_VERSION=$(grep -oPm1 "(?<=<TargetFramework>netcoreapp)[^<]+" <$(find ./src/Xavier.API/*.csproj))
+  FIRST_DEPLOY_PROJECT=(${PROJECTS[@]})
+  TARGET_VERSION=$(grep -oPm1 "(?<=<TargetFramework>netcoreapp)[^<]+" <$(find $SRC_DIR/$FIRST_DEPLOY_PROJECT/*.csproj))
   if [[ $TARGET_VERSION == 2.* ]]; then
     echo "Target version is .net core 2"
     source $BUILDPACK_DIR/bin/compile-csproj-2

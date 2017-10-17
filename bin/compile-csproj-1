@@ -26,9 +26,6 @@ cat <<EOF >$BUILD_DIR/.profile.d/000_dotnet.sh
 export PATH="\$HOME/dotnet:\$PATH"
 EOF
 
-# figure out which projects we should deploy/publish
-PROJECTS=$(awk -F "=" '/project/ {print $2}' ${DEPLOYMENT_FILE_LOCATION} | tr -d ' ')
-
 export NUGET_PACKAGES="${CACHE_DIR}/nuget/cache"
 
 # run on  each project we need to publish, build it and deploy it
