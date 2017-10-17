@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
+: ${DOTNET_SDK_VERSION:="2.0.0"}
 
-curl -sSL -o dotnet.tar.gz https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-2.0.0-linux-x64.tar.gz
-mkdir -p ${BUILD_DIR}/.heroku/dotnet && tar zxf dotnet.tar.gz -C ${BUILD_DIR}/.heroku/dotnet
-ln -s ${BUILD_DIR}/.heroku/dotnet /app
+DOTNET_CACHE_LOCATION=${CACHE_DIR}/dotnet/${DOTNET_SDK_VERSION}
+mkdir -p ${DOTNET_CACHE_LOCATION}
 
-export PATH="/app/dotnet:${PATH}"
-export PATH="/app/.heroku/dotnet:${PATH}"
+curl -sSL -o dotnet.tar.gz https://download.microsoft.com/download/1/B/4/1B4DE605-8378-47A5-B01B-2C79D6C55519/dotnet-sdk-$DOTNET_SDK_VERSION-linux-x64.tar.gz
+tar zxf dotnet.tar.gz -C ${DOTNET_CACHE_LOCATION}
+
+export PATH="${DOTNET_CACHE_LOCATION}:${PATH}"
 
 cd $BUILD_DIR
 dotnet --info
@@ -26,3 +28,4 @@ dotnet --info
 			echo "Publish of '$PROJECT_DIR_NAME' successed"
       done
  done <<< "$PROJECTS"
+ 
